@@ -75,7 +75,11 @@ class FtxScraper:
         
         Returns
         -------
-        
+        files: json
+            A json file with the cryptocurrency name, price and link
+
+        screenshots: png
+            A screenshot of the graph which represents the traffic in the last 24 hours.
         '''
         if not os.path.exists('./raw_data/screenshots'):
             os.makedirs('./raw_data/screenshots')
@@ -119,8 +123,3 @@ class FtxScraper:
 
 if __name__ == '__main__':
     bot = FtxScraper()
-
-    #unittest is there to compare the expected results from now ( which are the results we get) with results we might be getting tomorrow or in the future. 
-    #it gives us a way to let us know when something has changed in the script or output. 
-    #one example I am already facing is that the order of crypto has changed. This means that if I order everything alphabetically, then I can circumvent the problem.
-    #making my code more robust!
