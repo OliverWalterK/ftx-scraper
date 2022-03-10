@@ -1,22 +1,21 @@
-import unittest, all_url
+import unittest
 
 from numpy import dtype
-import scraper2
+import scraper
 
 class ScraperTestCase(unittest.TestCase):
     def setUp(self):
-        self.bot = scraper2.FtxScraper('https://ftx.com/markets')
+        self.bot = scraper.FtxScraper('https://ftx.com/markets')
 
     def test_find_all_links(self):
         actual_find_all_links = self.bot.find_all_links()
-        # self.assertEqual(actual_find_all_links, all_url.expected_original_find_all_links)
         self.assertIsInstance(actual_find_all_links, list)
         for element in actual_find_all_links:
+            self.assertEqual(element[0:16], 'https://ftx.com/') 
             self.assertIsInstance(element, str)
 
     # def test_validate_links(self):
         actual_valid_links = self.bot.valid_links()
-        # self.assertEqual(actual_valid_links, all_url.expected_original_valid_links)
         self.assertIsInstance(actual_valid_links, list)
         for element in actual_valid_links:
             self.assertEqual(element[0:22], 'https://ftx.com/trade/') 

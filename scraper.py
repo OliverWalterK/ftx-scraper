@@ -32,7 +32,15 @@ class FtxScraper:
             self.driver = Chrome(ChromeDriverManager().install())
         self.driver.maximize_window()
         self.driver.get(self.url)
-        self.engine = create_engine(f"{aws_creds.DATABASE_TYPE}+{aws_creds.DBAPI}://{aws_creds.USER}:{aws_creds.PASSWORD}@{aws_creds.HOST}:{aws_creds.PORT}/{aws_creds.DATABASE}")
+
+        DATABASE_TYPE = aws_creds.DATABASE_TYPE
+        DBAPI = aws_creds.DBAPI
+        HOST = aws_creds.HOST
+        USER = aws_creds.USER
+        PASSWORD = aws_creds.PASSWORD
+        PORT = aws_creds.PORT
+        DATABASE = aws_creds.DATABASE
+        self.engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
         self.client = boto3.client('s3')
     
     def find_all_links(self):
@@ -75,7 +83,7 @@ class FtxScraper:
     def get_data_local(self):
         '''
         This method will loop through the valid_url list and extract the price, name and link for every cryptocurrency. 
-        Furthermore, it will make a uuid for every entry.
+        Furthermore, it will make a uuid for every entry and save it in a dictionary.
         
         Returns
         -------
@@ -84,8 +92,18 @@ class FtxScraper:
 
         screenshots: png
             A screenshot of the graph which represents the traffic in the last 24 hours.
+
+        Creates
+        -------
+
+        folder: raw_data, screenshots and json_files
+
+        Dumps
+        -----
+
+        dictionary
         '''
-        for links in self.valid_url[:3]:
+        for links in self.valid_url:
             self.driver.get(links)
             time.sleep(2)
             self.dictionary = {
@@ -98,7 +116,7 @@ class FtxScraper:
                 unique_id = str(uuid.uuid4())
                 self.dictionary['UUID'].append(unique_id)
             except NoSuchElementException:
-                self.dictionary['UUID'].append('N/A')    
+                self.dictionary['UUID'].append('N/A')   
             try:
                 value = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]').text
                 self.dictionary['Price'].append(value)
@@ -119,47 +137,51 @@ class FtxScraper:
                 self.driver.save_screenshot(f'./raw_data/screenshots/{crypto_name}.png')
             except NoSuchElementException:
                 print("No pictures were found.")
+            if not os.path.exists('./raw_data/json_files'):
+                os.makedirs('./raw_data/json_files')
             with open(f'./raw_data/json_files/{crypto_name}.json', 'w') as fp:
                 json.dump(self.dictionary, fp)
-            self.client.upload_file(f'./raw_data/json_files/{crypto_name}.json', 'ftx-scraper', f'{crypto_name}.json')
+
 
     def upload_data(self):
         '''This method will create a temporary file and upload the file to AWS at the end.'''
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            for links in self.valid_url[:3]:
-                self.driver.get(links)
-                self.dictionary = {
-                                'UUID':[],
-                                'Link':[],
-                                'Name':[],
-                                'Price':[]
-                                } 
-                time.sleep(2)
-                try:
-                    value = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]').text
-                    self.dictionary['Price'].append(value)
-                except NoSuchElementException:
-                    self.dictionary['Price'].append('N/A')
-                try:
-                    self.dictionary['Link'].append(links)
-                except NoSuchElementException:
-                    self.dictionary['Link'].append('N/A')
-                try:
-                    crypto_name = links.split("/")[-1]
-                    self.dictionary['Name'].append(crypto_name)
-                except NoSuchElementException:
-                    self.dictionary['Name'].append('N/A')
-                try:
-                    unique_id = str(uuid.uuid4())
-                    self.dictionary['UUID'].append(unique_id)
-                except NoSuchElementException:
-                    self.dictionary['UUID'].append('N/A')
+        for links in self.valid_url:
+            self.driver.get(links)
+            self.dictionary = {
+                            'UUID':[],
+                            'Link':[],
+                            'Name':[],
+                            'Price':[]
+                            } 
+            time.sleep(2)
+            try:
+                value = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]').text
+                self.dictionary['Price'].append(value)
+            except NoSuchElementException:
+                self.dictionary['Price'].append('N/A')
+            try:
+                self.dictionary['Link'].append(links)
+            except NoSuchElementException:
+                self.dictionary['Link'].append('N/A')
+            try:
+                crypto_name = links.split("/")[-1]
+                self.dictionary['Name'].append(crypto_name)
+            except NoSuchElementException:
+                self.dictionary['Name'].append('N/A')
+            try:
+                unique_id = str(uuid.uuid4())
+                self.dictionary['UUID'].append(unique_id)
+            except NoSuchElementException:
+                self.dictionary['UUID'].append('N/A')
+            with tempfile.TemporaryDirectory() as tmpdirname:
                 try:
                     self.driver.save_screenshot(tmpdirname + f'/{crypto_name}.png')
+                    self.client.upload_file(tmpdirname + f'/{crypto_name}.png', 'ftx-scraper', f'{crypto_name}.png')
                 except NoSuchElementException:
-                    print("No pictures were found.")
-                self.client.upload_file(tmpdirname, 'ftx-scraper', f'{crypto_name}.json')
-
+                    print(f"No screenshot was made for {crypto_name}!")
+                with open(tmpdirname + f'/{crypto_name}.json', 'w') as fp:
+                    json.dump(self.dictionary, fp)
+                self.client.upload_file(tmpdirname + f'/{crypto_name}.json', 'ftx-scraper', f'{crypto_name}.json')
 
 if __name__ == '__main__':
     bot = FtxScraper()
