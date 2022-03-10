@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-import time, uuid, os, json, boto3, tempfile
+import time, uuid, os, json, boto3, tempfile, aws_creds
 from sqlalchemy import create_engine
 
 class FtxScraper:
@@ -32,15 +32,7 @@ class FtxScraper:
             self.driver = Chrome(ChromeDriverManager().install())
         self.driver.maximize_window()
         self.driver.get(self.url)
-
-        DATABASE_TYPE = 'postgresql'
-        DBAPI = 'psycopg2'
-        HOST = 'ftx-scraper2.cn4izzmm7yyd.eu-west-2.rds.amazonaws.com' 
-        USER = 'postgres'
-        PASSWORD = '8750Ironpineapple?'
-        PORT = 5432
-        DATABASE = 'postgres'
-        self.engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
+        self.engine = create_engine(f"{aws_creds.DATABASE_TYPE}+{aws_creds.DBAPI}://{aws_creds.USER}:{aws_creds.PASSWORD}@{aws_creds.HOST}:{aws_creds.PORT}/{aws_creds.DATABASE}")
         self.client = boto3.client('s3')
     
     def find_all_links(self):
