@@ -1,7 +1,5 @@
-from email.contentmanager import raw_data_manager
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
@@ -70,7 +68,7 @@ class FtxScraper:
         Returns
         -------
         valid_url: list
-            A list of all relevant links which will be looped in the next step
+            A list of all relevant links which will be looped in the next step.
         '''
         self.valid_url = []
         for i in self.all_url:
@@ -82,16 +80,16 @@ class FtxScraper:
 
     def get_data_local(self):
         '''
-        This method will loop through the valid_url list and extract the price, name and link for every cryptocurrency. 
-        Furthermore, it will make a uuid for every entry and save it in a dictionary.
+        This method will loop through the valid_url list and extract the price, name, and link for every cryptocurrency. 
+        Furthermore, it will create a uuid for every entry and save it in the dictionary.
         
-        Returns
+        Creates
         -------
         files: json
-            A json file with the cryptocurrency name, price and link
+            A json file with the cryptocurrency name, uuid, price and link
 
         screenshots: png
-            A screenshot of the graph which represents the traffic in the last 24 hours.
+            A screenshot of the last 24 hours market value.
         '''
         for links in self.valid_url:
             self.driver.get(links)
@@ -134,7 +132,20 @@ class FtxScraper:
 
 
     def upload_data(self):
-        '''This method will create a temporary file and upload the file to AWS at the end.'''
+        '''
+        This method will loop through the valid_url list and extract the price, name, and link for every cryptocurrency. 
+        Furthermore, it will create a uuid for every entry and save it in the dictionary.
+        It will create a temporary file and upload the file to AWS for each iteration.
+
+        Uploads
+        -------
+        files: json
+            A json file with the cryptocurrency name, uuid, price and link.
+
+        screenshots: png
+            A screenshot of the last 24 hours market value.
+
+        '''
         for links in self.valid_url:
             self.driver.get(links)
             self.dictionary = {

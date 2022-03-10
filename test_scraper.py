@@ -1,6 +1,5 @@
 import unittest
 
-from numpy import dtype
 import scraper
 
 class ScraperTestCase(unittest.TestCase):
