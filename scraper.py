@@ -92,16 +92,6 @@ class FtxScraper:
 
         screenshots: png
             A screenshot of the graph which represents the traffic in the last 24 hours.
-
-        Creates
-        -------
-
-        folder: raw_data, screenshots and json_files
-
-        Dumps
-        -----
-
-        dictionary
         '''
         for links in self.valid_url:
             self.driver.get(links)

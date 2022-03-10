@@ -11,10 +11,10 @@ class ScraperTestCase(unittest.TestCase):
         actual_find_all_links = self.bot.find_all_links()
         self.assertIsInstance(actual_find_all_links, list)
         for element in actual_find_all_links:
-            self.assertEqual(element[0:16], 'https://ftx.com/') 
             self.assertIsInstance(element, str)
 
-    # def test_validate_links(self):
+    def test_validate_links(self):
+        all_url = self.bot.find_all_links()
         actual_valid_links = self.bot.valid_links()
         self.assertIsInstance(actual_valid_links, list)
         for element in actual_valid_links:
