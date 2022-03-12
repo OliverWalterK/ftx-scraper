@@ -22,8 +22,10 @@ class FtxScraper:
     driver:
         This is the webdriver object.
     '''
-    def __init__(self, url, options=None):
+    def __init__(self, url:str, options=None):
         self.url = url
+        # self.options = Options()
+        # self.options.add_argument('--headless')
         if options:
             self.driver = Chrome(ChromeDriverManager().install(), options=options)
         else:
