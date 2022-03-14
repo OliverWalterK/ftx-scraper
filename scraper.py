@@ -6,6 +6,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 import time, uuid, os, json, boto3, tempfile, aws_creds
+import pandas as pd
 from sqlalchemy import create_engine
 
 class FtxScraper:
@@ -74,10 +75,8 @@ class FtxScraper:
         '''
         self.valid_url = []
         for i in self.all_url:
-            if "trade" and "-" in i:
+            if "trade" in i:
                 self.valid_url.append(i)
-        del self.valid_url[-4:]
-        del self.valid_url[:2]
         return self.valid_url
 
     def get_data_local(self):
@@ -93,6 +92,12 @@ class FtxScraper:
         screenshots: png
             A screenshot of the last 24 hours market value.
         '''
+        self.df_dictionary = {
+                                'UUID':[],
+                                'Link':[],
+                                'Name':[],
+                                'Price':[]
+                             } 
         count = 0
         for links in self.valid_url:
             self.driver.get(links)
@@ -109,31 +114,44 @@ class FtxScraper:
             try:
                 unique_id = str(uuid.uuid4())
                 self.dictionary['UUID'].append(unique_id)
+                self.df_dictionary['UUID'].append(unique_id)
             except NoSuchElementException:
-                self.dictionary['UUID'].append('N/A')   
+                self.dictionary['UUID'].append('N/A') 
+                self.df_dictionary['UUID'].append('N/A')  
             try:
                 value = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]').text
                 self.dictionary['Price'].append(value)
+                self.df_dictionary['Price'].append(value)
             except NoSuchElementException:
                 self.dictionary['Price'].append('N/A')
+                self.df_dictionary['Price'].append('N/A')
             try:
                 self.dictionary['Link'].append(links)
+                self.df_dictionary['Link'].append(links)
             except NoSuchElementException:
                 self.dictionary['Link'].append('N/A')
+                self.df_dictionary['Link'].append('N/A')
             try:
                 self.dictionary['Name'].append(crypto_name)
+                self.df_dictionary['Name'].append(crypto_name)
             except NoSuchElementException:
                 self.dictionary['Name'].append('N/A')
+                self.df_dictionary['Name'].append('N/A')
+            # creating a folder for the screenshots.
             try:
                 if not os.path.exists('./raw_data/screenshots'):
                     os.makedirs('./raw_data/screenshots')
                 self.driver.save_screenshot(f'./raw_data/screenshots/{crypto_name}.png')
             except NoSuchElementException:
-                print("No pictures were found.")
+                print("No screenshot was made for {crypto_name}.")
+            # creating a json folder for all json files.
             if not os.path.exists('./raw_data/json_files'):
                 os.makedirs('./raw_data/json_files')
             with open(f'./raw_data/json_files/{crypto_name}.json', 'w') as fp:
                 json.dump(self.dictionary, fp)
+            # creating a data frame with all data 
+        df_dictionary = pd.DataFrame(self.df_dictionary)
+        df_dictionary.to_sql('df_dictionary', con=self.engine, if_exists='append', index=False)
 
 
     def upload_data(self):
