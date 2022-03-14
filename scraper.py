@@ -93,8 +93,12 @@ class FtxScraper:
         screenshots: png
             A screenshot of the last 24 hours market value.
         '''
+        count = 0
         for links in self.valid_url:
             self.driver.get(links)
+            crypto_name = links.split("/")[-1]
+            count = count + 1
+            print(f'Downloading data for {crypto_name}, {count}/{len(self.valid_url)}.')
             time.sleep(2)
             self.dictionary = {
                                 'UUID':[],
@@ -117,7 +121,6 @@ class FtxScraper:
             except NoSuchElementException:
                 self.dictionary['Link'].append('N/A')
             try:
-                crypto_name = links.split("/")[-1]
                 self.dictionary['Name'].append(crypto_name)
             except NoSuchElementException:
                 self.dictionary['Name'].append('N/A')
@@ -148,8 +151,12 @@ class FtxScraper:
             A screenshot of the last 24 hours market value.
 
         '''
+        count = 0
         for links in self.valid_url:
             self.driver.get(links)
+            crypto_name = links.split("/")[-1]
+            count = count + 1
+            print(f'Uploading data for {crypto_name}, {count}/{len(self.valid_url)}.')
             self.dictionary = {
                             'UUID':[],
                             'Link':[],
@@ -167,7 +174,6 @@ class FtxScraper:
             except NoSuchElementException:
                 self.dictionary['Link'].append('N/A')
             try:
-                crypto_name = links.split("/")[-1]
                 self.dictionary['Name'].append(crypto_name)
             except NoSuchElementException:
                 self.dictionary['Name'].append('N/A')
