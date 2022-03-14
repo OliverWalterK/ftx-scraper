@@ -98,6 +98,12 @@ class FtxScraper:
                     'Name':[],
                     'Price':[]
                     } 
+        self.df_dictionary = {
+                        'UUID':[],
+                        'Link':[],
+                        'Name':[],
+                        'Price':[]
+                    } 
         try:
             unique_id = str(uuid.uuid4())
             self.dictionary['UUID'].append(unique_id)
@@ -124,7 +130,7 @@ class FtxScraper:
         except NoSuchElementException:
             self.dictionary['Name'].append('N/A')
             self.df_dictionary['Name'].append('N/A')
-        return self.dictionary
+        return self.dictionary, self.df_dictionary
 
     def download_data_locally(self):
         '''
@@ -140,13 +146,7 @@ class FtxScraper:
             A screenshot of the last 24 hours market value.
         '''
         count = 0
-        self.df_dictionary = {
-                        'UUID':[],
-                        'Link':[],
-                        'Name':[],
-                        'Price':[]
-                            } 
-        for links in self.valid_url[:5]:
+        for links in self.valid_url[:9]:
             self.crypto_name = links.split("/")[-1]
             self.driver.get(links)
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]')))
@@ -184,46 +184,21 @@ class FtxScraper:
 
         '''
         count = 0
-        for links in self.valid_url:
+        for links in self.valid_url[:5]:
             self.driver.get(links)
-            crypto_name = links.split("/")[-1]
+            self.crypto_name = links.split("/")[-1]
+            self.creating_dictionary(links)
             count = count + 1
-            print(f'Uploading data for {crypto_name}, {count}/{len(self.valid_url)}.')
-            self.dictionary = {
-                            'UUID':[],
-                            'Link':[],
-                            'Name':[],
-                            'Price':[]
-                            } 
-            time.sleep(2)
-            try:
-                value = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]').text
-                self.dictionary['Price'].append(value)
-            except NoSuchElementException:
-                self.dictionary['Price'].append('N/A')
-            try:
-                self.dictionary['Link'].append(links)
-            except NoSuchElementException:
-                self.dictionary['Link'].append('N/A')
-            try:
-                self.dictionary['Name'].append(crypto_name)
-            except NoSuchElementException:
-                self.dictionary['Name'].append('N/A')
-            try:
-                unique_id = str(uuid.uuid4())
-                self.dictionary['UUID'].append(unique_id)
-            except NoSuchElementException:
-                self.dictionary['UUID'].append('N/A')
+            print(f'Uploading data:(json) and screenshot:(png) for {self.crypto_name}, {count}/{len(self.valid_url)}.')
             with tempfile.TemporaryDirectory() as tmpdirname:
                 try:
-                    self.driver.save_screenshot(tmpdirname + f'/{crypto_name}.png')
-                    self.client.upload_file(tmpdirname + f'/{crypto_name}.png', 'ftx-scraper', f'{crypto_name}.png')
+                    self.driver.save_screenshot(tmpdirname + f'/{self.crypto_name}.png')
+                    self.client.upload_file(tmpdirname + f'/{self.crypto_name}.png', 'ftx-scraper', f'{self.crypto_name}.png')
                 except NoSuchElementException:
-                    print(f"No screenshot was made for {crypto_name}!")
-                with open(tmpdirname + f'/{crypto_name}.json', 'w') as fp:
+                    print(f"No screenshot was made for {self.crypto_name}!")
+                with open(tmpdirname + f'/{self.crypto_name}.json', 'w') as fp:
                     json.dump(self.dictionary, fp)
-                self.client.upload_file(tmpdirname + f'/{crypto_name}.json', 'ftx-scraper', f'{crypto_name}.json')
-
+                self.client.upload_file(tmpdirname + f'/{self.crypto_name}.json', 'ftx-scraper', f'{self.crypto_name}.json')
         df_dictionary = pd.DataFrame(self.df_dictionary)
         df_dictionary.to_sql('df_dictionary', con=self.engine, if_exists='append', index=False)
 
