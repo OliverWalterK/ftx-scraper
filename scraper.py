@@ -132,7 +132,7 @@ class FtxScraper:
             self.df_dictionary['Name'].append('N/A')
         return self.dictionary, self.df_dictionary
 
-    def download_data_locally(self):
+    def download_data(self):
         '''
         This method will loop through the valid_url list and extract the price, name, and link for every cryptocurrency. 
         Furthermore, it will create a uuid for every entry and save it in the dictionary.
@@ -146,7 +146,7 @@ class FtxScraper:
             A screenshot of the last 24 hours market value.
         '''
         count = 0
-        for links in self.valid_url[:9]:
+        for links in self.valid_url:
             self.crypto_name = links.split("/")[-1]
             self.driver.get(links)
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]')))
@@ -184,7 +184,7 @@ class FtxScraper:
 
         '''
         count = 0
-        for links in self.valid_url[:5]:
+        for links in self.valid_url:
             self.driver.get(links)
             self.crypto_name = links.split("/")[-1]
             self.creating_dictionary(links)
