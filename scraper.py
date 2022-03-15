@@ -83,9 +83,11 @@ class FtxScraper:
 
     def creating_dictionary(self, links):
         '''
+        This method will create the dictionaries from which information is plotted/extracted.
+
         Input
         -----
-        links
+        links: Iterating through loop.
         
         Output
         ------
@@ -96,16 +98,19 @@ class FtxScraper:
                     'UUID':[],
                     'Link':[],
                     'Name':[],
-                    'Price':[]
+                    'Price':[],
+                    'Time':[]
                     } 
         self.df_dictionary = {
                         'UUID':[],
                         'Link':[],
                         'Name':[],
-                        'Price':[]
+                        'Price':[],
+                        'Time':[]
                     } 
+        unique_id = str(uuid.uuid4())
+        current_time = datetime.datetime.now()
         try:
-            unique_id = str(uuid.uuid4())
             self.dictionary['UUID'].append(unique_id)
             self.df_dictionary['UUID'].append(unique_id)
         except NoSuchElementException:
@@ -130,6 +135,8 @@ class FtxScraper:
         except NoSuchElementException:
             self.dictionary['Name'].append('N/A')
             self.df_dictionary['Name'].append('N/A')
+        self.dictionary['Time'].append(current_time.strftime("%x"))
+        self.df_dictionary['Time'].append(current_time.strftime("%x"))
         return self.dictionary, self.df_dictionary
 
     def download_data(self):
@@ -151,21 +158,21 @@ class FtxScraper:
             self.driver.get(links)
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]')))
             time.sleep(1)
+            current_time = datetime.datetime.now()
             self.creating_dictionary(links)
             count = count + 1
             print(f'Downloading data:(json) and taking screenshot:(png) for {self.crypto_name}, {count}/{len(self.valid_url)}.')
-            if not os.path.exists('./raw_data/json_files'):
-                os.makedirs('./raw_data/json_files')
-            with open(f'./raw_data/json_files/{self.crypto_name}.json', 'w') as fp:
+            if not os.path.exists(f'./raw_data/{self.crypto_name}'):
+                os.makedirs(f'./raw_data/{self.crypto_name}')
+            with open(f'./raw_data/{self.crypto_name}/{current_time}.json', 'w') as fp:
                 json.dump(self.dictionary, fp)
             try:
-                if not os.path.exists('./raw_data/screenshots'):
-                    os.makedirs('./raw_data/screenshots')
-                self.driver.save_screenshot(f'./raw_data/screenshots/{self.crypto_name}.png')
+                self.driver.save_screenshot(f'./raw_data/{self.crypto_name}/{current_time}.png')
             except NoSuchElementException:
-                print("No screenshot was made for {self.crypto_name}.")
-        df_dictionary = pd.DataFrame(self.df_dictionary)
-        df_dictionary.to_sql('df_dictionary', con=self.engine, if_exists='append', index=False)
+                print(f"No screenshot was made for {self.crypto_name}.")
+        self.df_dictionary = pd.DataFrame(self.df_dictionary)
+        self.df_dictionary.to_csv('~/Desktop/AiCore/Scraper/ftx-scraper/raw_data/dataframe.csv', index = False)
+        
 
 
     def upload_data(self):
@@ -186,6 +193,7 @@ class FtxScraper:
         count = 0
         for links in self.valid_url:
             self.driver.get(links)
+            time.sleep(1)
             self.crypto_name = links.split("/")[-1]
             self.creating_dictionary(links)
             count = count + 1
