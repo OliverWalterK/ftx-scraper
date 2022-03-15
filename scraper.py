@@ -81,68 +81,11 @@ class FtxScraper:
                 self.valid_url.append(i)
         return self.valid_url
 
-    def creating_dictionary(self, links):
-        '''
-        This method will create the dictionaries from which information is plotted/extracted.
-
-        Input
-        -----
-        links: Iterating through loop.
-        
-        Output
-        ------
-        Dictionary
-        
-        '''
-        self.dictionary = {
-                    'UUID':[],
-                    'Link':[],
-                    'Name':[],
-                    'Price':[],
-                    'Time':[]
-                    } 
-        self.df_dictionary = {
-                        'UUID':[],
-                        'Link':[],
-                        'Name':[],
-                        'Price':[],
-                        'Time':[]
-                    } 
-        unique_id = str(uuid.uuid4())
-        current_time = datetime.datetime.now()
-        try:
-            self.dictionary['UUID'].append(unique_id)
-            self.df_dictionary['UUID'].append(unique_id)
-        except NoSuchElementException:
-            self.dictionary['UUID'].append('N/A')
-            self.df_dictionary['UUID'].append('N/A')
-        try:
-            value = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]').text
-            self.dictionary['Price'].append(value)
-            self.df_dictionary['Price'].append(value)
-        except NoSuchElementException:
-            self.dictionary['Price'].append('N/A')
-            self.df_dictionary['Price'].append('N/A')
-        try:
-            self.dictionary['Link'].append(links)
-            self.df_dictionary['Link'].append(links)
-        except NoSuchElementException:
-            self.dictionary['Link'].append('N/A')
-            self.df_dictionary['Link'].append('N/A')
-        try:
-            self.dictionary['Name'].append(self.crypto_name)
-            self.df_dictionary['Name'].append(self.crypto_name)
-        except NoSuchElementException:
-            self.dictionary['Name'].append('N/A')
-            self.df_dictionary['Name'].append('N/A')
-        self.dictionary['Time'].append(current_time.strftime("%x"))
-        self.df_dictionary['Time'].append(current_time.strftime("%x"))
-        return self.dictionary, self.df_dictionary
-
     def download_data(self):
         '''
-        This method will loop through the valid_url list and extract the price, name, and link for every cryptocurrency. 
-        Furthermore, it will create a uuid for every entry and save it in the dictionary.
+        This method will loop through the valid_url list and extract the price, name, link and time for every cryptocurrency. 
+        Furthermore, it will create a uuid for every entry and save it in the dictionary. It will also create directories for every cryptocurrency and save a json
+        and a screenshot of the market in those directories with time stamps.
         
         Creates
         -------
@@ -152,29 +95,68 @@ class FtxScraper:
         screenshots: png
             A screenshot of the last 24 hours market value.
         '''
+        crypto_dictionary = {
+                    'UUID':[],
+                    'Link':[],
+                    'Name':[],
+                    'Price':[],
+                    'Time':[]
+                                } 
+        df_global_dictionary = {
+                        'UUID':[],
+                        'Link':[],
+                        'Name':[],
+                        'Price':[],
+                        'Time':[]
+                                    } 
         count = 0
         for links in self.valid_url:
-            self.crypto_name = links.split("/")[-1]
+            crypto_name = links.split("/")[-1]
             self.driver.get(links)
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]')))
             time.sleep(1)
             current_time = datetime.datetime.now()
-            self.creating_dictionary(links)
-            count = count + 1
-            print(f'Downloading data:(json) and taking screenshot:(png) for {self.crypto_name}, {count}/{len(self.valid_url)}.')
-            if not os.path.exists(f'./raw_data/{self.crypto_name}'):
-                os.makedirs(f'./raw_data/{self.crypto_name}')
-            with open(f'./raw_data/{self.crypto_name}/{current_time}.json', 'w') as fp:
-                json.dump(self.dictionary, fp)
             try:
-                self.driver.save_screenshot(f'./raw_data/{self.crypto_name}/{current_time}.png')
+                unique_id = str(uuid.uuid4())
+                crypto_dictionary['UUID'].append(unique_id)
+                df_global_dictionary['UUID'].append(unique_id)
             except NoSuchElementException:
-                print(f"No screenshot was made for {self.crypto_name}.")
-        self.df_dictionary = pd.DataFrame(self.df_dictionary)
-        self.df_dictionary.to_csv('~/Desktop/AiCore/Scraper/ftx-scraper/raw_data/dataframe.csv', index = False)
+                crypto_dictionary['UUID'].append('N/A')
+                df_global_dictionary['UUID'].append('N/A')
+            try:
+                value = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]').text
+                crypto_dictionary['Price'].append(value)
+                df_global_dictionary['Price'].append(value)
+            except NoSuchElementException:
+                crypto_dictionary['Price'].append('N/A')
+                df_global_dictionary['Price'].append('N/A')
+            try:
+                crypto_dictionary['Link'].append(links)
+                df_global_dictionary['Link'].append(links)
+            except NoSuchElementException:
+                crypto_dictionary['Link'].append('N/A')
+                df_global_dictionary['Link'].append('N/A')
+            try:
+                crypto_dictionary['Name'].append(crypto_name)
+                df_global_dictionary['Name'].append(crypto_name)
+            except NoSuchElementException:
+                crypto_dictionary['Name'].append('N/A')
+                df_global_dictionary['Name'].append('N/A')
+            crypto_dictionary['Time'].append(current_time.strftime("%c"))
+            df_global_dictionary['Time'].append(current_time.strftime("%c"))
+            count = count + 1
+            print(f'Downloading data:(json) and taking screenshot:(png) for {crypto_name}, {count}/{len(self.valid_url)}.')
+            if not os.path.exists(f'./raw_data/{crypto_name}'):
+                os.makedirs(f'./raw_data/{crypto_name}')
+            with open(f'./raw_data/{crypto_name}/{current_time}.json', 'w') as fp:
+                json.dump(crypto_dictionary, fp)
+            try:
+                self.driver.save_screenshot(f'./raw_data/{crypto_name}/{current_time}.png')
+            except NoSuchElementException:
+                print(f"No screenshot was made for {crypto_name}.")
+        df_global_dictionary = pd.DataFrame(df_global_dictionary)
+        df_global_dictionary.to_csv('~/Desktop/AiCore/Scraper/ftx-scraper/raw_data/dataframe.csv', index = False)
         
-
-
     def upload_data(self):
         '''
         This method will loop through the valid_url list and extract the price, name, and link for every cryptocurrency. 
