@@ -110,10 +110,10 @@ class FtxScraper:
                         'Time':[]
                                     } 
         count = 0
-        for links in self.valid_url[:5]:
+        for links in self.valid_url:
             crypto_name = links.split("/")[-1]
             self.driver.get(links)
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]')))
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '/')))   #//span[@class='jss689']//descendant::p
             time.sleep(1)
             current_time = datetime.datetime.now()
             try:
@@ -177,7 +177,7 @@ class FtxScraper:
             self.driver.get(links)
             time.sleep(1)
             self.crypto_name = links.split("/")[-1]
-            self.creating_dictionary(links)
+            # self.creating_dictionary(links)
             count = count + 1
             print(f'Uploading data:(json) and screenshot:(png) for {self.crypto_name}, {count}/{len(self.valid_url)}.')
             with tempfile.TemporaryDirectory() as tmpdirname:
