@@ -1,4 +1,4 @@
-import unittest, warnings
+import unittest
 
 import scraper
 
@@ -9,8 +9,8 @@ class ScraperTestCase(unittest.TestCase):
     def test_find_all_links(self):
         actual_find_all_links = self.bot.find_all_links()
         self.assertIsInstance(actual_find_all_links, list)
-        for element in actual_find_all_links:
-            self.assertIsInstance(element, str)
+        for elements in actual_find_all_links:
+            self.assertIsInstance(elements, str)
 
     def test_validate_links(self):
         all_url = self.bot.find_all_links()

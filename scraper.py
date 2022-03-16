@@ -115,7 +115,7 @@ class FtxScraper:
         for links in self.valid_url:
             crypto_name = links.split("/")[-1]
             self.driver.get(links)
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//p[normalize-space()='42,348 BTC']")))   
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "/")))   
             time.sleep(1)
             try:
                 crypto_dictionary['UUID'].append(self.unique_id)
@@ -156,7 +156,6 @@ class FtxScraper:
                 print(f"No screenshot was made for {crypto_name}.")
         df_global_dictionary = pd.DataFrame(df_global_dictionary)
         df_global_dictionary.to_csv('~/Desktop/AiCore/Scraper/ftx-scraper/raw_data/dataframe.csv', index = False)
-        
     def upload_data(self):
         '''
         This method will loop through the valid_url list and extract the price, name, and link for every cryptocurrency. 
@@ -189,6 +188,7 @@ class FtxScraper:
         count = 0
         for links in self.valid_url[:4]:
             self.driver.get(links)
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "/")))   
             time.sleep(1)
             crypto_name = links.split("/")[-1]
             try:
