@@ -13,6 +13,7 @@ I have also added a unittest in order to check whether the returned datatypes ar
 1. Whether each entry in the list is a string type.
 2. It checks whether the links in valid_links() actually start with "https://ftx.com/trade/". 
 3. It check if the get_all_links() and valid_links() methods return a list.
+4. Whether the value for the cryptocurrency on the website gives a float.
 
 
 

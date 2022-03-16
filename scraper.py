@@ -11,7 +11,9 @@ from sqlalchemy import create_engine
 
 class FtxScraper:
     '''
-    This class is a scraper that will run through all cryptocurrencies on ftx.com/markets and extract information.
+    This class is a scraper that will run through all cryptocurrencies on ftx.com/markets and extract information. 
+    
+    FULLSCREEN REQUIRED
     
     Parameters
     ----------
@@ -42,8 +44,7 @@ class FtxScraper:
         self.url = url
         self.all_url = []
         self.valid_url = []
-        self.unique_id = str(uuid.uuid4())
-        self.current_time = datetime.datetime.now()
+
         self.engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
         self.client = boto3.client('s3')
         self.crypto_dictionary = {
@@ -62,7 +63,7 @@ class FtxScraper:
                                         'Time':[],
                                         #'Percentage increase':[]
                                     } 
-        self.driver.maximize_window()
+        self.driver.maximize_window() #XPATH WILL NOT FIND VALUE IF NOT RUNNING IN MAXIMIZED WINDOW
         self.driver.get(self.url)
     
     def find_all_links(self):
@@ -96,7 +97,7 @@ class FtxScraper:
         for i in self.all_url:
             if 'USD' in i:
                 continue
-            if "trade" in i:
+            if "https://ftx.com/trade/" in i:
                 self.valid_url.append(i)
         return self.valid_url
 
@@ -108,21 +109,22 @@ class FtxScraper:
         
         Creates
         -------
-        files: json
+        crypto named files: json
             A json file with the cryptocurrency name, uuid, price and link
 
         screenshots: png
             A screenshot of the last 24 hours market value.
         '''
         count = 0
-        for links in self.valid_url[:3]:
+        for links in self.valid_url[:10]:
             crypto_name = links.split("/")[-1]
             self.driver.get(links)
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h5[@class='MuiTypography-root MuiTypography-h5']")))   
+            current_time = datetime.datetime.now()
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h5[@class='MuiTypography-root MuiTypography-h5']"))) 
             time.sleep(1)
             try:
-                self.crypto_dictionary['UUID'].append(self.unique_id)
-                self.global_dictionary['UUID'].append(self.unique_id)
+                self.crypto_dictionary['UUID'].append(str(uuid.uuid4()))
+                self.global_dictionary['UUID'].append(str(uuid.uuid4()))
             except NoSuchElementException:
                 self.crypto_dictionary['UUID'].append('N/A')
                 self.global_dictionary['UUID'].append('N/A')
@@ -145,20 +147,21 @@ class FtxScraper:
             except NoSuchElementException:
                 self.crypto_dictionary['Name'].append('N/A')
                 self.global_dictionary['Name'].append('N/A')
-            self.crypto_dictionary['Time'].append(self.current_time.strftime("%c"))
-            self.global_dictionary['Time'].append(self.current_time.strftime("%c"))
+            self.crypto_dictionary['Time'].append(current_time.strftime("%c"))
+            self.global_dictionary['Time'].append(current_time.strftime("%c"))
             count = count + 1
             print(f'Downloading data:(json) and taking screenshot:(png) for {crypto_name}, {count}/{len(self.valid_url)}.')
             if not os.path.exists(f'./raw_data/{crypto_name}'):
                 os.makedirs(f'./raw_data/{crypto_name}')
-            with open(f'./raw_data/{crypto_name}/{self.current_time}.json', 'w') as fp:
+            with open(f'./raw_data/{crypto_name}/{current_time}.json', 'w') as fp:
                 json.dump(self.crypto_dictionary, fp)
             try:
-                self.driver.save_screenshot(f'./raw_data/{crypto_name}/{self.current_time}.png')
+                self.driver.save_screenshot(f'./raw_data/{crypto_name}/{current_time}.png')
             except NoSuchElementException:
                 print(f"No screenshot was made for {crypto_name}.")
         dataframe = pd.DataFrame(self.global_dictionary)
         dataframe.to_csv('~/Desktop/AiCore/Scraper/ftx-scraper/raw_data/dataframe.csv', index = False)
+
     def upload_data(self):
         '''
         This method will loop through the valid_url list and extract the price, name, and link for every cryptocurrency. 
@@ -205,8 +208,8 @@ class FtxScraper:
             except NoSuchElementException:
                 self.crypto_dictionary['Name'].append('N/A')
                 self.global_dictionary['Name'].append('N/A')
-            self.crypto_dictionary['Time'].append(self.current_time.strftime("%c"))
-            self.global_dictionary['Time'].append(self.current_time.strftime("%c"))
+            self.crypto_dictionary['Time'].append(datetime.datetime.now().strftime("%c"))
+            self.global_dictionary['Time'].append(datetime.datetime.now().strftime("%c"))
             count = count + 1
             print(f'Uploading data:(json) and screenshot:(png) for {crypto_name}, {count}/{len(self.valid_url)}.')
             with tempfile.TemporaryDirectory() as tmpdirname:
