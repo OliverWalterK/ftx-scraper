@@ -172,25 +172,67 @@ class FtxScraper:
             A screenshot of the last 24 hours market value.
 
         '''
+        crypto_dictionary = {
+                    'UUID':[],
+                    'Link':[],
+                    'Name':[],
+                    'Price':[],
+                    'Time':[]
+                                } 
+        df_global_dictionary = {
+                        'UUID':[],
+                        'Link':[],
+                        'Name':[],
+                        'Price':[],
+                        'Time':[]
+                                    } 
         count = 0
-        for links in self.valid_url:
+        for links in self.valid_url[:4]:
             self.driver.get(links)
             time.sleep(1)
-            self.crypto_name = links.split("/")[-1]
-            # self.creating_dictionary(links)
+            crypto_name = links.split("/")[-1]
+            current_time = datetime.datetime.now()
+            try:
+                unique_id = str(uuid.uuid4())
+                crypto_dictionary['UUID'].append(unique_id)
+                df_global_dictionary['UUID'].append(unique_id)
+            except NoSuchElementException:
+                crypto_dictionary['UUID'].append('N/A')
+                df_global_dictionary['UUID'].append('N/A')
+            try:
+                value = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div/main/div[3]/div[3]/div/div/div/span[1]/p[2]').text
+                crypto_dictionary['Price'].append(value)
+                df_global_dictionary['Price'].append(value)
+            except NoSuchElementException:
+                crypto_dictionary['Price'].append('N/A')
+                df_global_dictionary['Price'].append('N/A')
+            try:
+                crypto_dictionary['Link'].append(links)
+                df_global_dictionary['Link'].append(links)
+            except NoSuchElementException:
+                crypto_dictionary['Link'].append('N/A')
+                df_global_dictionary['Link'].append('N/A')
+            try:
+                crypto_dictionary['Name'].append(crypto_name)
+                df_global_dictionary['Name'].append(crypto_name)
+            except NoSuchElementException:
+                crypto_dictionary['Name'].append('N/A')
+                df_global_dictionary['Name'].append('N/A')
+            crypto_dictionary['Time'].append(current_time.strftime("%c"))
+            df_global_dictionary['Time'].append(current_time.strftime("%c"))
             count = count + 1
-            print(f'Uploading data:(json) and screenshot:(png) for {self.crypto_name}, {count}/{len(self.valid_url)}.')
+            print(f'Uploading data:(json) and screenshot:(png) for {crypto_name}, {count}/{len(self.valid_url)}.')
             with tempfile.TemporaryDirectory() as tmpdirname:
                 try:
-                    self.driver.save_screenshot(tmpdirname + f'/{self.crypto_name}.png')
-                    self.client.upload_file(tmpdirname + f'/{self.crypto_name}.png', 'ftx-scraper', f'{self.crypto_name}.png')
+                    self.driver.save_screenshot(tmpdirname + f'/{crypto_name}.png')
+                    self.client.upload_file(tmpdirname + f'/{crypto_name}.png', 'ftx-scraper', f'{crypto_name}_{current_time.strftime("%c")}.png')
                 except NoSuchElementException:
-                    print(f"No screenshot was made for {self.crypto_name}!")
-                with open(tmpdirname + f'/{self.crypto_name}.json', 'w') as fp:
-                    json.dump(self.dictionary, fp)
-                self.client.upload_file(tmpdirname + f'/{self.crypto_name}.json', 'ftx-scraper', f'{self.crypto_name}.json')
-        df_dictionary = pd.DataFrame(self.df_dictionary)
-        df_dictionary.to_sql('df_dictionary', con=self.engine, if_exists='append', index=False)
+                    print(f"No screenshot was made for {crypto_name}!")
+                with open(tmpdirname + f'/{crypto_name}.json', 'w') as fp:
+                    json.dump(crypto_dictionary, fp)
+                self.client.upload_file(tmpdirname + f'/{crypto_name}.json', 'ftx-scraper', f'{crypto_name}_{current_time.strftime("%c")}.json')
+        df_dictionary = pd.DataFrame(df_global_dictionary)
+        df_dictionary.to_sql('df_global_dictionary', con=self.engine, if_exists='append', index=False)
 
 
 if __name__ == '__main__':
