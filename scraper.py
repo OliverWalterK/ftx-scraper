@@ -123,8 +123,10 @@ class FtxScraper:
         '''
         print("Starting loop and extracting information")
         count = 0
-        for links in self.valid_url[:10]:
+        for links in self.valid_url:
             crypto_name = links.split("/")[-1]
+            if crypto_name in self.global_dictionary['Name']:
+                continue
             self.driver.get(links)
             current_time = datetime.datetime.now()
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/main[1]/div[3]/div[3]/div[1]/div[1]/div[1]/span[1]/p[2]"))) 
