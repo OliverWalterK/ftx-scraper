@@ -1,7 +1,7 @@
 import unittest, time
 from selenium.webdriver.common.by import By
 
-import scraper
+import scraper 
 
 class ScraperTestCase(unittest.TestCase):
     def setUp(self):

@@ -5,7 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-import time, uuid, os, json, boto3, tempfile, aws_creds, datetime
+import time, uuid, os, json, boto3, tempfile, datetime
+from config import aws_creds
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -232,6 +233,3 @@ class FtxScraper:
                 self.client.upload_file(tmpdirname + f'/{crypto_name}.json', 'ftx-scraper', f'{crypto_name}_{self.current_time.strftime("%c")}.json')
         dataframe = pd.DataFrame(self.global_dictionary)
         dataframe.to_sql('ftx-dataframe', con=self.engine, if_exists='append', index=False)
-
-if __name__ == '__main__':
-    bot = FtxScraper()
