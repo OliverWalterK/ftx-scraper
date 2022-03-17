@@ -1,6 +1,6 @@
 import scraper
 
-bot = scraper.FtxScraper('https://ftx.com/markets')
+bot = scraper.FtxScraper('https://ftx.com/markets', options='--headless')
 
 if __name__ == '__main__':
     bot.find_all_links()

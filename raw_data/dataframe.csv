@@ -1,11 +1,11 @@
 UUID,Link,Name,Price,Time
-02ac9602-4812-4bca-9ea1-56e01275fd70,https://ftx.com/trade/1INCH-0325,1INCH-0325,1.4974,Wed Mar 16 21:29:05 2022
-f3a472d1-868a-4b38-a8d3-6558f25ea691,https://ftx.com/trade/1INCH-PERP,1INCH-PERP,1.5078,Wed Mar 16 21:29:08 2022
-db6050ea-c213-4894-be50-a9184db02010,https://ftx.com/trade/AAVE-0325,AAVE-0325,138.32,Wed Mar 16 21:29:11 2022
-09d4e868-c18c-465b-8915-6097928822bf,https://ftx.com/trade/AAVE-PERP,AAVE-PERP,137.99,Wed Mar 16 21:29:14 2022
-384d7857-51cd-404c-8533-6c544c2fa708,https://ftx.com/trade/ADA-0325,ADA-0325,0.827255,Wed Mar 16 21:29:18 2022
-8035af9b-f385-4104-8971-e19b18c89c55,https://ftx.com/trade/ADA-PERP,ADA-PERP,0.828200,Wed Mar 16 21:29:21 2022
-6b4cc9f2-ccc0-4568-a6ad-fa8006e714a8,https://ftx.com/trade/AGLD-PERP,AGLD-PERP,1.1165,Wed Mar 16 21:29:25 2022
-7c6134cd-1706-4d04-b251-27eb31c2e4bc,https://ftx.com/trade/ALCX-PERP,ALCX-PERP,95.4,Wed Mar 16 21:29:28 2022
-e9d0e1b4-184e-4981-b9ca-c198c5456961,https://ftx.com/trade/ALGO-0325,ALGO-0325,0.7299,Wed Mar 16 21:29:31 2022
-f6efd220-de2f-43ea-96de-d1550cf0aa49,https://ftx.com/trade/ALGO-PERP,ALGO-PERP,0.7302,Wed Mar 16 21:29:34 2022
+b11cbb9a-cd49-4dea-9e08-841d159d64ea,https://ftx.com/trade/1INCH-PERP,1INCH-PERP,1.4889,Thu Mar 17 14:49:50 2022
+5b9b230a-a4da-4636-9f67-e1ebddc42779,https://ftx.com/trade/AAVE-PERP,AAVE-PERP,144.40,Thu Mar 17 14:49:53 2022
+9aba41fa-55ad-4487-a3e3-1b2948421b61,https://ftx.com/trade/ADA-PERP,ADA-PERP,0.846207,Thu Mar 17 14:49:55 2022
+993875f0-ab54-4806-bfd7-d765b99023e0,https://ftx.com/trade/AGLD-PERP,AGLD-PERP,1.1856,Thu Mar 17 14:49:58 2022
+3ffaaf36-7651-4b9b-96b0-5a15b5287723,https://ftx.com/trade/ALCX-PERP,ALCX-PERP,96.8,Thu Mar 17 14:50:01 2022
+65972a8b-348e-4222-9c4a-355de20b3b77,https://ftx.com/trade/ALGO-PERP,ALGO-PERP,0.7350,Thu Mar 17 14:50:04 2022
+e9fabc5a-7d88-4a52-af5a-bbd3f8eaf169,https://ftx.com/trade/ALICE-PERP,ALICE-PERP,6.2634,Thu Mar 17 14:50:07 2022
+7c8278e9-037f-4c97-ad22-6ab9e9e80d3e,https://ftx.com/trade/ALPHA-PERP,ALPHA-PERP,0.27979,Thu Mar 17 14:50:10 2022
+827f0531-c581-4a27-922f-fcc59ebb33a0,https://ftx.com/trade/ALT-PERP,ALT-PERP,"3,282.59",Thu Mar 17 14:50:13 2022
+d2d87435-38d6-42db-b5ca-d75fe82669f8,https://ftx.com/trade/AMPL-PERP,AMPL-PERP,1.0637,Thu Mar 17 14:50:16 2022

@@ -26,8 +26,8 @@ class FtxScraper:
         This is the webdriver object.
     '''
     def __init__(self, url:str, options=None):
-        # self.options = Options()
-        # self.options.add_argument('--headless')
+        options = Options()
+        options.add_argument('--headless')
         if options:
             self.driver = Chrome(ChromeDriverManager().install(), options=options)
         else:
@@ -47,6 +47,7 @@ class FtxScraper:
 
         self.engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
         self.client = boto3.client('s3')
+        
         self.crypto_dictionary = {
                                     'UUID':[],
                                     'Link':[],
@@ -76,6 +77,7 @@ class FtxScraper:
             An alphabetically ordered list of all url on the website.    
         '''
         try:
+            print("Trying to find all url's on FTX")
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//a[@href]")))
             loop = self.driver.find_elements(By. XPATH, "//a[@href]")
             for links in loop:
@@ -83,22 +85,26 @@ class FtxScraper:
         except:
             print("No links found. Website might not have loaded correctly. Try again.")
         self.all_url.sort()
+        print("Successfully created list of all url's")
         return self.all_url
 
     def valid_links(self):
         '''
         This method aims to clean the list (all_url) and get only the relevant links (valid_url).
-        
+        This scraper will only look at perpetual contracts and not quarterly contracts (PERP in name)
+
         Returns
         -------
         valid_url: list
             A list of all relevant links which will be looped in the next step.
         '''
+        print("Cleaning up list")
         for i in self.all_url:
             if 'USD' in i:
                 continue
-            if "https://ftx.com/trade/" in i:
+            if "https://ftx.com/trade/" and "PERP" in i:
                 self.valid_url.append(i)
+        print("Successfully cleaned url list")
         return self.valid_url
 
     def download_data(self):
@@ -115,12 +121,13 @@ class FtxScraper:
         screenshots: png
             A screenshot of the last 24 hours market value.
         '''
+        print("Starting loop and extracting information")
         count = 0
         for links in self.valid_url[:10]:
             crypto_name = links.split("/")[-1]
             self.driver.get(links)
             current_time = datetime.datetime.now()
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h5[@class='MuiTypography-root MuiTypography-h5']"))) 
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/main[1]/div[3]/div[3]/div[1]/div[1]/div[1]/span[1]/p[2]"))) 
             time.sleep(1)
             try:
                 self.crypto_dictionary['UUID'].append(str(uuid.uuid4()))
@@ -129,7 +136,7 @@ class FtxScraper:
                 self.crypto_dictionary['UUID'].append('N/A')
                 self.global_dictionary['UUID'].append('N/A')
             try:
-                value = self.driver.find_element(By.XPATH, "//h5[@class='MuiTypography-root MuiTypography-h5']").text
+                value = self.driver.find_element(By.XPATH, "/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/main[1]/div[3]/div[3]/div[1]/div[1]/div[1]/span[1]/p[2]").text
                 self.crypto_dictionary['Price'].append(value)
                 self.global_dictionary['Price'].append(value)
             except NoSuchElementException:
