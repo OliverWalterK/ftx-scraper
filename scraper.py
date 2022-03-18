@@ -29,6 +29,10 @@ class FtxScraper:
     def __init__(self, url:str, options=None):
         options = Options()
         options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument("--window-size=1920,1080")
+        options.add_argument("--remote-debugging-port=9222")
         if options:
             self.driver = Chrome(ChromeDriverManager().install(), options=options)
         else:
@@ -163,7 +167,7 @@ class FtxScraper:
             print(f'Downloading data:(json) and taking screenshot:(png) for {crypto_name}, {count}/{len(self.valid_url)}.')
             if not os.path.exists(f'./raw_data/{crypto_name}'):
                 os.makedirs(f'./raw_data/{crypto_name}')
-            with open(f'./raw_data/{crypto_name}/{current_time}.json', 'w') as fp:
+            with open(f'./raw_data/{crypto_name}/{crypto_name}.json', 'w') as fp:
                 json.dump(self.crypto_dictionary, fp)
             try:
                 self.driver.save_screenshot(f'./raw_data/{crypto_name}/{current_time}.png')
