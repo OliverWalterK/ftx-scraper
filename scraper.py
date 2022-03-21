@@ -1,9 +1,6 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 import time, uuid, os, json, boto3, tempfile, datetime
@@ -29,10 +26,13 @@ class FtxScraper:
     '''
     def __init__(self, url:str, options=None):
 
-        options = Options()
+        options = webdriver.ChromeOptions()
         options.headless = True
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
 
-        PATH = "/home/oliver/Desktop/AiCore/Scraper/ftx-scraper/chromedriver"
+        PATH = "/usr/local/bin/chromedriver"
         self.driver = webdriver.Chrome(PATH, options=options)
 
         DATABASE_TYPE = aws_creds.DATABASE_TYPE
@@ -125,7 +125,7 @@ class FtxScraper:
         '''
         print("Starting loop and extracting information")
         count = 0
-        for links in self.valid_url:
+        for links in self.valid_url[:10]:
             crypto_name = links.split("/")[-1]
             if crypto_name in self.global_dictionary['Name']:
                 continue
@@ -171,7 +171,7 @@ class FtxScraper:
             except NoSuchElementException:
                 print(f"No screenshot was made for {crypto_name}.")
         dataframe = pd.DataFrame(self.global_dictionary)
-        dataframe.to_csv('~/Desktop/AiCore/Scraper/ftx-scraper/raw_data/dataframe.csv', index = False)
+        dataframe.to_csv('./raw_data/dataframe.csv', index = False)
 
     def upload_data(self):
         '''
@@ -189,7 +189,7 @@ class FtxScraper:
 
         '''
         count = 0
-        for links in self.valid_url[:4]:
+        for links in self.valid_url:
             self.driver.get(links)
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h5[@class='MuiTypography-root MuiTypography-h5']")))   
             time.sleep(1)
