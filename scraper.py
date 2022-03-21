@@ -1,5 +1,6 @@
-from selenium.webdriver import Chrome
+from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
@@ -27,16 +28,12 @@ class FtxScraper:
         This is the webdriver object.
     '''
     def __init__(self, url:str, options=None):
+
         options = Options()
-        options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument("--window-size=1920,1080")
-        options.add_argument("--remote-debugging-port=9222")
-        if options:
-            self.driver = Chrome(ChromeDriverManager().install(), options=options)
-        else:
-            self.driver = Chrome(ChromeDriverManager().install())
+        options.headless = True
+
+        PATH = "/home/oliver/Desktop/AiCore/Scraper/ftx-scraper/chromedriver"
+        self.driver = webdriver.Chrome(PATH, options=options)
 
         DATABASE_TYPE = aws_creds.DATABASE_TYPE
         DBAPI = aws_creds.DBAPI
@@ -52,6 +49,8 @@ class FtxScraper:
 
         self.engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
         self.client = boto3.client('s3')
+
+        self.driver.get(self.url)
         
         self.crypto_dictionary = {
                                     'UUID':[],
@@ -69,9 +68,7 @@ class FtxScraper:
                                         'Time':[],
                                         #'Percentage increase':[]
                                 } 
-        self.driver.maximize_window() #XPATH WILL NOT FIND VALUE IF NOT RUNNING IN MAXIMIZED WINDOW
-        self.driver.get(self.url)
-    
+
     def find_all_links(self):
         '''
         This method will find all links found on the website and compile it in a list.
@@ -109,7 +106,7 @@ class FtxScraper:
                 continue
             if "https://ftx.com/trade/" and "PERP" in i:
                 self.valid_url.append(i)
-        print(f"Successfully cleaned url list down to: {len(self.valid_url)}")
+        print(f"Successfully cleaned url list down to {len(self.valid_url)}")
         return self.valid_url
 
     def download_data(self):
@@ -192,7 +189,7 @@ class FtxScraper:
 
         '''
         count = 0
-        for links in self.valid_url:
+        for links in self.valid_url[:4]:
             self.driver.get(links)
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h5[@class='MuiTypography-root MuiTypography-h5']")))   
             time.sleep(1)
