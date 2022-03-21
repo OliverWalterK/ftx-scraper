@@ -68,7 +68,7 @@ class FtxScraper:
                                         'Price':[],
                                         'Time':[],
                                         #'Percentage increase':[]
-                                    } 
+                                } 
         self.driver.maximize_window() #XPATH WILL NOT FIND VALUE IF NOT RUNNING IN MAXIMIZED WINDOW
         self.driver.get(self.url)
     
@@ -90,7 +90,7 @@ class FtxScraper:
         except:
             print("No links found. Website might not have loaded correctly. Try again.")
         self.all_url.sort()
-        print("Successfully created list of all url's")
+        print(f"Successfully created list of all url's: {len(self.all_url)}")
         return self.all_url
 
     def valid_links(self):
@@ -109,7 +109,7 @@ class FtxScraper:
                 continue
             if "https://ftx.com/trade/" and "PERP" in i:
                 self.valid_url.append(i)
-        print("Successfully cleaned url list")
+        print(f"Successfully cleaned url list down to: {len(self.valid_url)}")
         return self.valid_url
 
     def download_data(self):
@@ -192,7 +192,7 @@ class FtxScraper:
 
         '''
         count = 0
-        for links in self.valid_url[:4]:
+        for links in self.valid_url:
             self.driver.get(links)
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h5[@class='MuiTypography-root MuiTypography-h5']")))   
             time.sleep(1)
