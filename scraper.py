@@ -7,6 +7,7 @@ import time, uuid, os, json, boto3, tempfile, datetime
 from config import aws_creds
 import pandas as pd
 from sqlalchemy import create_engine
+from tqdm import tqdm
 
 class FtxScraper:
     '''
@@ -25,15 +26,15 @@ class FtxScraper:
         This is the webdriver object.
     '''
     def __init__(self, url:str, options=None):
-
+        self.url = url
         options = webdriver.ChromeOptions()
         options.headless = True
-        options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
 
         PATH = "/usr/local/bin/chromedriver"
         self.driver = webdriver.Chrome(PATH, options=options)
+        self.driver.get(self.url)
 
         DATABASE_TYPE = aws_creds.DATABASE_TYPE
         DBAPI = aws_creds.DBAPI
@@ -43,15 +44,11 @@ class FtxScraper:
         PORT = aws_creds.PORT
         DATABASE = aws_creds.DATABASE
 
-        self.url = url
-        self.all_url = []
-        self.valid_url = []
-
         self.engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
         self.client = boto3.client('s3')
 
-        self.driver.get(self.url)
-        
+        self.all_url = []
+        self.valid_url = []
         self.crypto_dictionary = {
                                     'UUID':[],
                                     'Link':[],
@@ -125,7 +122,7 @@ class FtxScraper:
         '''
         print("Starting loop and extracting information")
         count = 0
-        for links in self.valid_url[:10]:
+        for links in tqdm(self.valid_url):
             crypto_name = links.split("/")[-1]
             if crypto_name in self.global_dictionary['Name']:
                 continue
@@ -161,7 +158,7 @@ class FtxScraper:
             self.crypto_dictionary['Time'].append(current_time.strftime("%c"))
             self.global_dictionary['Time'].append(current_time.strftime("%c"))
             count = count + 1
-            print(f'Downloading data:(json) and taking screenshot:(png) for {crypto_name}, {count}/{len(self.valid_url)}.')
+            # print(f'Downloading data:(json) and taking screenshot:(png) for {crypto_name}, {count}/{len(self.valid_url)}.')
             if not os.path.exists(f'./raw_data/{crypto_name}'):
                 os.makedirs(f'./raw_data/{crypto_name}')
             with open(f'./raw_data/{crypto_name}/{crypto_name}.json', 'w') as fp:
@@ -189,48 +186,55 @@ class FtxScraper:
 
         '''
         count = 0
-        for links in self.valid_url:
-            self.driver.get(links)
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h5[@class='MuiTypography-root MuiTypography-h5']")))   
-            time.sleep(1)
+        for links in tqdm(self.valid_url[:10]):
+            crypto_dictionary = {
+                                    'UUID':[],
+                                    'Link':[],
+                                    'Name':[],
+                                    'Price':[],
+                                    'Time':[],
+                                    #'Percentage increase':[]
+                                } 
             crypto_name = links.split("/")[-1]
+            if crypto_name in self.global_dictionary['Name']:
+                continue
+            self.driver.get(links)
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/main[1]/div[3]/div[3]/div[1]/div[1]/div[1]/span[1]/p[2]")))
+            time.sleep(1)
             try:
-                self.crypto_dictionary['UUID'].append(self.unique_id)
-                self.global_dictionary['UUID'].append(self.unique_id)
+                crypto_dictionary['UUID'].append(str(uuid.uuid4()))
+                self.global_dictionary['UUID'].append(str(uuid.uuid4()))
             except NoSuchElementException:
-                self.crypto_dictionary['UUID'].append('N/A')
+                crypto_dictionary['UUID'].append('N/A')
                 self.global_dictionary['UUID'].append('N/A')
             try:
-                value = self.driver.find_element(By.XPATH, "//h5[@class='MuiTypography-root MuiTypography-h5']").text
-                self.crypto_dictionary['Price'].append(value)
+                value = self.driver.find_element(By.XPATH, "/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/main[1]/div[3]/div[3]/div[1]/div[1]/div[1]/span[1]/p[2]").text
+                crypto_dictionary['Price'].append(value)
                 self.global_dictionary['Price'].append(value)
             except NoSuchElementException:
-                self.crypto_dictionary['Price'].append('N/A')
+                crypto_dictionary['Price'].append('N/A')
                 self.global_dictionary['Price'].append('N/A')
             try:
-                self.crypto_dictionary['Link'].append(links)
+                crypto_dictionary['Link'].append(links)
                 self.global_dictionary['Link'].append(links)
             except NoSuchElementException:
-                self.crypto_dictionary['Link'].append('N/A')
+                crypto_dictionary['Link'].append('N/A')
                 self.global_dictionary['Link'].append('N/A')
             try:
-                self.crypto_dictionary['Name'].append(crypto_name)
+                crypto_dictionary['Name'].append(crypto_name)
                 self.global_dictionary['Name'].append(crypto_name)
             except NoSuchElementException:
-                self.crypto_dictionary['Name'].append('N/A')
+                crypto_dictionary['Name'].append('N/A')
                 self.global_dictionary['Name'].append('N/A')
-            self.crypto_dictionary['Time'].append(datetime.datetime.now().strftime("%c"))
+            crypto_dictionary['Time'].append(datetime.datetime.now().strftime("%c"))
             self.global_dictionary['Time'].append(datetime.datetime.now().strftime("%c"))
             count = count + 1
-            print(f'Uploading data:(json) and screenshot:(png) for {crypto_name}, {count}/{len(self.valid_url)}.')
+            # print(f'Uploading data:(json) and screenshot:(png) for {crypto_name}, {count}/{len(self.valid_url)}.')
             with tempfile.TemporaryDirectory() as tmpdirname:
-                try:
-                    self.driver.save_screenshot(tmpdirname + f'/{crypto_name}.png')
-                    self.client.upload_file(tmpdirname + f'/{crypto_name}.png', 'ftx-scraper', f'{crypto_name}_{self.current_time.strftime("%c")}.png')
-                except NoSuchElementException:
-                    print(f"No screenshot was made for {crypto_name}!")
+                self.driver.save_screenshot(tmpdirname + f'/{crypto_name}.png')
+                self.client.upload_file(tmpdirname + f'/{crypto_name}.png', 'ftx-scraper', f'{crypto_name}_{(datetime.datetime.now().strftime("%c"))}.png')
                 with open(tmpdirname + f'/{crypto_name}.json', 'w') as fp:
-                    json.dump(self.crypto_dictionary, fp)
-                self.client.upload_file(tmpdirname + f'/{crypto_name}.json', 'ftx-scraper', f'{crypto_name}_{self.current_time.strftime("%c")}.json')
+                    json.dump(crypto_dictionary, fp)
+                self.client.upload_file(tmpdirname + f'/{crypto_name}.json', 'ftx-scraper', f'{crypto_name}_{(datetime.datetime.now().strftime("%c"))}.json')
         dataframe = pd.DataFrame(self.global_dictionary)
-        dataframe.to_sql('ftx-dataframe', con=self.engine, if_exists='append', index=False)
+        dataframe.to_sql('ftx-dataframe', con=self.engine, if_exists='replace', index=False)
