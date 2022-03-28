@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 import time, uuid, os, json, boto3, tempfile, datetime
-from config import aws_creds
+import aws_creds
 import pandas as pd
 from sqlalchemy import create_engine
 from tqdm import tqdm
@@ -45,7 +45,10 @@ class FtxScraper:
         DATABASE = aws_creds.DATABASE
 
         self.engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
-        self.client = boto3.client('s3')
+        self.client = boto3.client('s3',
+                    aws_access_key_id = aws_creds.aws_key_id,
+                    aws_secret_access_key = aws_creds.aws_secret_key,
+                    region_name = aws_creds.aws_region)
 
         self.all_url = []
         self.valid_url = []
