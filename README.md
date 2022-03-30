@@ -6,6 +6,8 @@ I extract data such as the name, link and price for each cryptocurrency. I also 
 
 This scraper has two methods for either downloading the data locally or uploading the data to a s3 bucket.
 
+The ftx-scraper has a docker image for uploading the data to the s3 bucket. 
+
 Unittest
 --------
 
