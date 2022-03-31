@@ -1,12 +1,14 @@
 # ftx-scraper
 AiCore's Scraper Project (FTX)
 
-I have made a scraper that can loop through all cryptocurrencies found on ftx.com.
-I extract data such as the name, link and price for each cryptocurrency. I also take a screenshot of the last 24 hours of traffic.
+I have made a scraper that can loop through all cryptocurrencies found on http://www.ftx.com/trade/.
+I extract data such as the crypto name, url and price. I also take a screenshot of the last 24 hours of traffic.
 
 This scraper has two methods for either downloading the data locally or uploading the data to a s3 bucket.
 
-The ftx-scraper has a docker image for uploading the data to the s3 bucket. 
+The ftx-scraper has a docker image which can be found here: docker pull walteroli91/ftx-scraper-ec2
+
+It also had a .yml file in order to monitor containers on prometheus or grafana.
 
 Unittest
 --------
