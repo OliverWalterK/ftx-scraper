@@ -1,5 +1,5 @@
-#to connect to prometheus
-docker run --rm -d -p 9090:9090 --name prometheus -v /home/ec2-user/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml --web.enable-lifecycle 
+##to connect to prometheus
+docker run --rm -d -p 9090:9090 --name prometheus -v /home/oliver/Desktop/AiCore/Scraper/ftx-scraper/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml --web.enable-lifecycle
 
-#for reloading prometheus after changing config files
+##for reloading prometheus after changing config files
 curl -X POST http://localhost:9090/-/reload

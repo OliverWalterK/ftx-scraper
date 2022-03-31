@@ -189,7 +189,7 @@ class FtxScraper:
 
         '''
         count = 0
-        for links in tqdm(self.valid_url[:10]):
+        for links in tqdm(self.valid_url[:50]):
             crypto_dictionary = {
                                     'UUID':[],
                                     'Link':[],
@@ -239,5 +239,5 @@ class FtxScraper:
                 with open(tmpdirname + f'/{crypto_name}.json', 'w') as fp:
                     json.dump(crypto_dictionary, fp)
                 self.client.upload_file(tmpdirname + f'/{crypto_name}.json', 'ftx-scraper', f'{crypto_name}_{(datetime.datetime.now().strftime("%c"))}.json')
-        dataframe = pd.DataFrame(self.global_dictionary)
-        dataframe.to_sql('ftx-dataframe', con=self.engine, if_exists='replace', index=False)
+        # dataframe = pd.DataFrame(self.global_dictionary)
+        # dataframe.to_sql('ftx-dataframe', con=self.engine, if_exists='replace', index=False)
