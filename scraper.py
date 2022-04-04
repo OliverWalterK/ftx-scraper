@@ -36,7 +36,7 @@ class FtxScraper:
         self.driver = webdriver.Chrome(PATH, options=options)
         self.driver.get(self.url)
 
-        DATABASE_TYPE = aws_creds.DATABASE_TYPE
+        DATABASE_TYPE = os.environ['DATABASE_TYPE'].DATABASE_TYPE
         DBAPI = aws_creds.DBAPI
         HOST = aws_creds.HOST
         USER = aws_creds.USER
@@ -58,7 +58,6 @@ class FtxScraper:
                                     'Name':[],
                                     'Price':[],
                                     'Time':[],
-                                    #'Percentage increase':[]
                                 } 
         self.global_dictionary = {
                                         'UUID':[],
@@ -66,7 +65,6 @@ class FtxScraper:
                                         'Name':[],
                                         'Price':[],
                                         'Time':[],
-                                        #'Percentage increase':[]
                                 } 
 
     def find_all_links(self):
