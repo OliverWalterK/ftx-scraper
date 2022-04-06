@@ -9,6 +9,8 @@ This scraper has two methods for either downloading the data locally or uploadin
 
 The ftx-scraper has a docker image, for uploading the data to my AWS S3 bucket, which can be found here: https://hub.docker.com/r/walteroli91/ftx-scraper-ec2.
 
+The script was modified (-headless mode) to allow the docker image to run on EC2 instances. 
+
 It also added a .yml file in order to monitor the docker containers on prometheus or grafana.
 
 I added a github action for CI/CD which will automatically update the docker image when there is a git push.
