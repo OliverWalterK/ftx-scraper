@@ -6,9 +6,9 @@ I extract data such as the crypto name, url and price. I also take a screenshot 
 
 This scraper has two methods for either downloading the data locally or uploading the data to a s3 bucket.
 
-The ftx-scraper has a docker image which can be found here: https://hub.docker.com/r/walteroli91/ftx-scraper-ec2.
+The ftx-scraper has a docker image, for uploading the data to my S3 bucket, which can be found here: https://hub.docker.com/r/walteroli91/ftx-scraper-ec2.
 
-It also had a .yml file in order to monitor containers on prometheus or grafana.
+It also added a .yml file in order to monitor containers on prometheus or grafana.
 
 Each push to github will automatically update the docker image.
 
