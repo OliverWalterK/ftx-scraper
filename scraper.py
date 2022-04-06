@@ -46,26 +46,26 @@ class FtxScraper:
 
         self.engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
         self.client = boto3.client('s3',
-                    aws_access_key_id = aws_creds.aws_key_id,
-                    aws_secret_access_key = aws_creds.aws_secret_key,
-                    region_name = aws_creds.aws_region)
+            aws_access_key_id = aws_creds.aws_key_id,
+            aws_secret_access_key = aws_creds.aws_secret_key,
+            region_name = aws_creds.aws_region)
 
         self.all_url = []
         self.valid_url = []
         self.crypto_dictionary = {
-                                    'UUID':[],
-                                    'Link':[],
-                                    'Name':[],
-                                    'Price':[],
-                                    'Time':[],
-                                } 
+            'UUID':[],
+            'Link':[],
+            'Name':[],
+            'Price':[],
+            'Time':[],
+        } 
         self.global_dictionary = {
-                                        'UUID':[],
-                                        'Link':[],
-                                        'Name':[],
-                                        'Price':[],
-                                        'Time':[],
-                                } 
+            'UUID':[],
+            'Link':[],
+            'Name':[],
+            'Price':[],
+            'Time':[],
+        } 
 
     def find_all_links(self):
         '''
@@ -189,13 +189,12 @@ class FtxScraper:
         count = 0
         for links in tqdm(self.valid_url[:50]):
             crypto_dictionary = {
-                                    'UUID':[],
-                                    'Link':[],
-                                    'Name':[],
-                                    'Price':[],
-                                    'Time':[],
-                                    #'Percentage increase':[]
-                                } 
+                'UUID':[],
+                'Link':[],
+                'Name':[],
+                'Price':[],
+                'Time':[],
+                } 
             crypto_name = links.split("/")[-1]
             if crypto_name in self.global_dictionary['Name']:
                 continue
