@@ -3,11 +3,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-import time, uuid, os, json, boto3, tempfile, datetime
-import aws_creds
+import time, uuid, os, json, boto3, tempfile, datetime, sys
 import pandas as pd
 from sqlalchemy import create_engine
 from tqdm import tqdm
+
+sys.path.append('/home/oliver/Desktop/AiCore/Scraper/ftx-scraper')
+import aws_creds
 
 class FtxScraper:
     '''
