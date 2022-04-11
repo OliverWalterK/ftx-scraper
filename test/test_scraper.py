@@ -1,6 +1,7 @@
-import unittest, time
+import unittest, time, sys
 from selenium.webdriver.common.by import By
 
+sys.path.append('/home/oliver/Desktop/AiCore/Scraper/ftx-scraper/src')
 import scraper 
 
 class ScraperTestCase(unittest.TestCase):
