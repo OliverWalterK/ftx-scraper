@@ -10,6 +10,6 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 
 COPY . .
 
-RUN pip install -r docker/requirements.txt
+RUN pip install -r requirements.txt
 
 CMD ["python", "demo.py"]
