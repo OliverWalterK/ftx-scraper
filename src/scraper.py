@@ -240,3 +240,5 @@ class FtxScraper:
                     print(f"No screenshot was made for {crypto_name}.")
             dataframe = pd.DataFrame(self.global_dictionary)
             dataframe.to_csv('./raw_data/dataframe.csv', index = False)
+
+            #test
