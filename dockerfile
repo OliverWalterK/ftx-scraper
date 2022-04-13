@@ -12,4 +12,4 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
-CMD ["python", "./src/demo.py"]
+CMD ["python", "src/demo.py"]

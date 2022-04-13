@@ -8,7 +8,7 @@ from selenium.common.exceptions import NoSuchElementException
 from sqlalchemy import create_engine
 from tqdm import tqdm
 
-sys.path.append('~/Desktop/AiCore/Scraper/ftx-scraper')
+sys.path.append("./")
 import aws_creds
 
 class FtxScraper:
