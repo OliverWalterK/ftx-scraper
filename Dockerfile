@@ -8,7 +8,9 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     && apt-get install -yqq unzip\
     && unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin
 
-COPY . .
+COPY . /home
+
+WORKDIR /home
 
 RUN pip install -r requirements.txt
 
