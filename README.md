@@ -1,5 +1,5 @@
 # ftx-scraper
-AiCore's Scraper Project (FTX)
+Scraper Project (FTX)
 ------------------------------
 
 I have made a scraper that can loop through all cryptocurrencies found on http://www.ftx.com/trade/.
