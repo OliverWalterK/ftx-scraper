@@ -115,7 +115,6 @@ class FtxScraper:
 
         screenshots: png
             A screenshot of the last 24 hours market value.
-
         '''
         print("Starting loop and extracting information")
         # count = 0

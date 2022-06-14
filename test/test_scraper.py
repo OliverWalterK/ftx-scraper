@@ -23,7 +23,7 @@ class ScraperTestCase(unittest.TestCase):
             self.assertIsInstance(element, str)
 
     def test_download_data(self):
-        for links in self.bot.valid_links()[:1]:
+        for links in self.bot.valid_links():
             self.bot.driver.get(links)
             time.sleep(2)
             self.assertIsInstance(self.bot.driver.find_element(By.XPATH, "//h5[@class='MuiTypography-root MuiTypography-h5']").text, float)
