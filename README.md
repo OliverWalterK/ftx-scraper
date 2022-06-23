@@ -8,10 +8,11 @@ Overview
 I have made a scraper that can loop through all cryptocurrencies found on http://www.ftx.com.
 I extract data such as the crypto name, url, price and save them in a json file. The scraper also takes a screenshot of the last 24 hours of traffic.
 
-The scraper has two options for either downloading the data locally or uploading the data to my S3 bucket and a RDS on AWS.
+The scraper has two options for either downloading the data locally or uploading the data to my S3 bucket and RDS on AWS.
 
 When downloading the data locally, it will create folders for every cryptocurrency and store the data in json files. The screenshot will be saved as a png file.
 ![image](https://user-images.githubusercontent.com/97681246/175306791-e566aed5-d2fa-4c45-a7f1-3e8085fcfd1e.png)
+This is what will be seen inside each folder:
 ![image](https://user-images.githubusercontent.com/97681246/175308368-b09368af-d72b-41bb-add4-1ad55ada005b.png)
 
 The upload method will simply create the json and png files in the S3 bucket and RDS with timestamps
