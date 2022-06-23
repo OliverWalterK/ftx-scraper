@@ -17,6 +17,7 @@ When downloading the data locally, it will create folders for every cryptocurren
 
 
 The upload method will simply create the json and png files in the S3 bucket and RDS with timestamps
+
 ![image](https://user-images.githubusercontent.com/97681246/175307697-8a6e8dd2-4b9c-4068-bce6-8a1164a78341.png)
 
 Docker
@@ -26,9 +27,16 @@ The ftx-scraper has a docker image, for uploading the data to my AWS S3 bucket, 
 
 The script was modified (-headless mode) to allow the docker image to run on EC2 instances. 
 
+Monitoring
+----------
+
 It also added a .yml file in order to monitor the docker containers on prometheus or grafana.
 
+Automation
+----------
+
 I added a github action for CI/CD which will automatically update the docker image when there is a git push.
+
 
 Unittest
 --------
