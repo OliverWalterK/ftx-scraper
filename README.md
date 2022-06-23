@@ -1,13 +1,23 @@
 # ftx-scraper
 Scraper Project (FTX) using Selenium Webdriver.
-------------------------------
+-----------------------------------------------
+
+Overview
+--------
 
 I have made a scraper that can loop through all cryptocurrencies found on http://www.ftx.com.
 I extract data such as the crypto name, url, price and save them in a json file. The scraper also takes a screenshot of the last 24 hours of traffic.
 
-This scraper has two methods for either downloading the data locally or uploading the data to a s3 bucket or an RDS which can be accessed over SQL.
+The scraper has two options for either downloading the data locally or uploading the data to my S3 bucket and a RDS on AWS.
 
-![image](https://user-images.githubusercontent.com/97681246/175305224-21d12b75-a290-4b01-8857-33eb91036f2e.png)
+When downloading the data locally, it will create folders for every cryptocurrency and create files like json to store the data or a sscreenshot (png file) for the last 24 hours of traffic.
+![image](https://user-images.githubusercontent.com/97681246/175306791-e566aed5-d2fa-4c45-a7f1-3e8085fcfd1e.png)
+
+The upload method will simply create the json and png files in the bucket with timestamps
+![image](https://user-images.githubusercontent.com/97681246/175307697-8a6e8dd2-4b9c-4068-bce6-8a1164a78341.png)
+
+Docker
+------
 
 The ftx-scraper has a docker image, for uploading the data to my AWS S3 bucket, which can be found here: https://hub.docker.com/r/walteroli91/ftx-scraper-ec2.
 
