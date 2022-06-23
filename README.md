@@ -12,8 +12,9 @@ The scraper has two options for either downloading the data locally or uploading
 
 When downloading the data locally, it will create folders for every cryptocurrency and store the data in json files. The screenshot will be saved as a png file.
 ![image](https://user-images.githubusercontent.com/97681246/175306791-e566aed5-d2fa-4c45-a7f1-3e8085fcfd1e.png)
-This is what will be seen inside each folder:
-![image](https://user-images.githubusercontent.com/97681246/175308368-b09368af-d72b-41bb-add4-1ad55ada005b.png)
+
+![image](https://user-images.githubusercontent.com/97681246/175309209-d664da8d-71e4-467d-bcbe-bae2d76c3d1c.png)
+
 
 The upload method will simply create the json and png files in the S3 bucket and RDS with timestamps
 ![image](https://user-images.githubusercontent.com/97681246/175307697-8a6e8dd2-4b9c-4068-bce6-8a1164a78341.png)
